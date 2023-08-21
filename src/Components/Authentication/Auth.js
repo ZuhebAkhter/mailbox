@@ -1,9 +1,10 @@
 import React, { useRef, useState } from "react";
-import { Form, Button, Container } from "react-bootstrap";
+import { Form, Button, Container,Spinner } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
 const Auth = () => {
 const [isLogin, setIslogin]=useState(true);
+const [loading,setLoading]=useState(false);
     const emailInputRef=useRef();
     const passwordInputRef=useRef();
      const navigate=useNavigate();
@@ -15,6 +16,7 @@ const authFormHandler=(e)=>{
    e.preventDefault();
    const enteredEmail=emailInputRef.current.value;
    const enteredPassword=passwordInputRef.current.value;
+   setLoading(true)
    let url;
 
    if (isLogin) {
@@ -37,7 +39,7 @@ const authFormHandler=(e)=>{
     },
   }
 ).then((res) => {
-
+setLoading(false)
   if (res.ok) {
     return res.json();
   } else {
@@ -53,6 +55,7 @@ const authFormHandler=(e)=>{
 }).then((data)=>{
   if(isLogin){
     navigate('/welcome')
+    
   }
 
 })
@@ -66,6 +69,7 @@ const authFormHandler=(e)=>{
   return (
     <Container className="d-block justify-content-center mt-5 w-25 ">
       <Form onSubmit={authFormHandler} className="border rounded p-5 mt-3 ">
+
       <h2 className="text-center pb-3">{isLogin ? 'Login':'SignUp'}</h2>
 
         <Form.Group className="mb-3" controlId="formBasicEmail">
@@ -82,8 +86,11 @@ const authFormHandler=(e)=>{
         <Button variant="primary" type="submit">
         {isLogin ? 'Login':'SignUp'}
         </Button>
-        <Button onClick={switchAuthModeHandler} type="button" variant="primary" className="d-block mx-auto mt-3">{isLogin ? 'Create Acount':'Log in Existing User'}</Button>
+        <Button onClick={switchAuthModeHandler} type="button" variant="primary" className="d-block mx-auto mt-3">{isLogin ? 'Create Acount':'Log in Existing User'}</Button><br/>
+        {loading && <div className="d-block justify-content-center ms-5"><Spinner className="ms-5"  animation="border" /></div>}
       </Form>
+      
+
     </Container>
   );
 };
