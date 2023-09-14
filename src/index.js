@@ -4,16 +4,21 @@ import './index.css';
 import App from './App';
 import '../node_modules/react-bootstrap/dist/react-bootstrap'
 import '../node_modules/bootstrap/dist/css/bootstrap.css'
+import 'bootstrap-icons/font/bootstrap-icons.css';
 import { BrowserRouter } from 'react-router-dom';
 import { AuthContextProvider } from './Store/AuthContext';
 import { MessageContextProvider } from './Store/MessageContext';
+import { Provider } from 'react-redux';
+import store from './Store/Store';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <MessageContextProvider>
   <AuthContextProvider>
   <BrowserRouter>
+  <Provider store={store}>
     <App />
+    </Provider>
     </BrowserRouter>
     </AuthContextProvider>
     </MessageContextProvider>

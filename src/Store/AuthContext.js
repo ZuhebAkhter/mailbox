@@ -7,26 +7,40 @@ const AuthContext = createContext({
   currentUser: "",
   login: (token) => {},
   logout: () => {},
+  setPrf:(user) => {}
+
 });
 
 export const AuthContextProvider = (props) => {
-  const [token, setToken] = useState(null);
+    const initialToken=localStorage.getItem('token');
+
+  const [token, setToken] = useState(initialToken);
+  const [user,setUser]= useState(null)
 
   const UserisLoggedIn = !!token;
 
   const loginHandler = (token) => {
+    localStorage.setItem('token',token)
     setToken(token)
   };
   const logoutHandler = () => {
+    localStorage.removeItem('token')
+    localStorage.removeItem('user')
     setToken(null);
+    setUser(null)
   };
+  const setuserHandler=(user)=>{
+    localStorage.setItem('user',user)
+    setUser(user)
+  }
 
   const authcontext = {
     token: token,
     isLoggedIn: UserisLoggedIn,
-    currentUser: "",
+    currentUser: user,
     login: loginHandler,
     logout: logoutHandler,
+    setPrf:setuserHandler
   };
 
   return (

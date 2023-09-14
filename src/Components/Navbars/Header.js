@@ -10,20 +10,23 @@ const Header = () => {
    authCtx.logout();
    navigate('/')
     }
+    const userLogged=localStorage.getItem('user')
   return (
-    <Navbar className="bg-info">
-      <Container fluid>
-        <Navbar.Brand>Mail Box</Navbar.Brand>
+      
+    <Navbar  className="bg-info">
+        <Navbar.Brand><i className="bi bi-envelope-at-fill p-2"></i>
+Mail Box</Navbar.Brand>
        
         <Navbar.Toggle />
         <Navbar.Collapse className="justify-content-end">
           <Navbar.Text>
-            Signed in as: <a href="#login">Mark Otto</a>
+            Signed in as: {userLogged}
           </Navbar.Text>
-          <Button className='m-2' onClick={LogoutHandler} variant='danger'>Logout</Button>
+         {authCtx.isLoggedIn && <Button className='m-2' onClick={LogoutHandler} variant='danger'>Logout</Button>}
         </Navbar.Collapse>
-      </Container>
+      
     </Navbar>
+    
   )
 }
 

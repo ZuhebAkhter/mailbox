@@ -1,14 +1,20 @@
-import { useRef, useState } from "react";
-import { Modal, Button, InputGroup, Form } from "react-bootstrap";
+import { useContext, useRef, useState } from "react";
+import { Modal, Button, InputGroup, Form, Alert } from "react-bootstrap";
 import "./ComposeModal.css";
 import { EditorState, convertToRaw } from "draft-js";
 import { Editor } from "react-draft-wysiwyg";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
+import AuthContext from "../../Store/AuthContext";
+import MessageContext from "../../Store/MessageContext";
 
 function ComposeModal({ show, hide }) {
   const [editorState, setEditorState] = useState(EditorState.createEmpty());
+  const [posting,setposting]=useState(false)
   const subjectInputref=useRef();
   const usersInputref=useRef();
+  const authCtx=useContext(AuthContext);
+  const messCtx=useContext(MessageContext)
+  console.log(authCtx)
 
   const onEditorStateChange = (newEditorState) => {
     setEditorState(newEditorState);
@@ -18,7 +24,8 @@ function ComposeModal({ show, hide }) {
     const enteredUser=usersInputref.current.value;
     const enteredSub=subjectInputref.current.value;
      const enteredMessage = convertToRaw(editorState.getCurrentContent());
-     console.log(enteredUser,enteredSub,enteredMessage.blocks)
+     const from=localStorage.getItem('user');
+     console.log(enteredUser,enteredSub,enteredMessage.blocks,from)
      let message='';
 
       enteredMessage.blocks.map((ele)=>(
@@ -28,8 +35,14 @@ function ComposeModal({ show, hide }) {
       const userMessage={
         userMail:enteredUser,
         userSub:enteredSub,
-        usertext:message
+        usertext:message,
+        from:from,
+        read:false
       }
+      console.log(userMessage)
+
+
+      messCtx.loadedMessages.push(userMessage)
     //   const response = await fetch(
     //     `https://httpreact-2edb8-default-rtdb.firebaseio.com/${enteredUser}.json`,
     //     {
@@ -47,7 +60,7 @@ function ComposeModal({ show, hide }) {
     const emailofUser = enteredUser.split(/[@.]/).join("");
 
 
-        const response = await fetch(`https://try2-7cacf-default-rtdb.asia-southeast1.firebasedatabase.app/${emailofUser}.json`, {
+        const response = await fetch(`https://emailclient-16191-default-rtdb.firebaseio.com/${emailofUser}.json`, {
           method: 'POST',
           body: JSON.stringify(userMessage),
           headers: {
@@ -55,7 +68,11 @@ function ComposeModal({ show, hide }) {
           }
         });
         const data = await response.json();
+        setposting(true)
+
         console.log(data);
+
+
       
     };
   
@@ -109,6 +126,8 @@ function ComposeModal({ show, hide }) {
             </div>
           </Form>
         </Modal.Body>
+        { posting && <Alert>Message Sent</Alert>}
+
       </Modal>
     </>
   );

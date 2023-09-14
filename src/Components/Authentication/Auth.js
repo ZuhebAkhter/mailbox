@@ -2,7 +2,8 @@ import React, { useContext, useRef, useState } from "react";
 import { Form, Button, Container, Spinner } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import AuthContext from "../../Store/AuthContext";
-import MessageContext from "../../Store/MessageContext";
+import { useDispatch, useSelector } from "react-redux";
+import { addMessage } from "../../Store/MessageSlice";
 
 const Auth = () => {
   const [isLogin, setIslogin] = useState(true);
@@ -11,8 +12,9 @@ const Auth = () => {
   const passwordInputRef = useRef();
   const navigate = useNavigate();
   const authCtx=useContext(AuthContext)
-  const messageCtx=useContext(MessageContext)
-  console.log(authCtx)
+  const dispatch=useDispatch();
+  const messSlice=useSelector(state => state.message)
+  
 
   const switchAuthModeHandler = () => {
     setIslogin((prevstate) => !prevstate);
@@ -24,6 +26,8 @@ const Auth = () => {
     const enteredEmail = emailInputRef.current.value;
     localStorage.setItem('email',enteredEmail)
   const enteredPassword = passwordInputRef.current.value;
+  const userEmailz=enteredEmail.split(/[@.]/).join("");
+
     setLoading(true);
     let url;
 
@@ -49,6 +53,7 @@ const Auth = () => {
         setLoading(false);
         if (res.ok) {
           return res.json();
+         
         } else {
           return res.json().then((data) => {
             let errormessage = "Email Exists";
@@ -62,43 +67,55 @@ const Auth = () => {
       .then((data) => {
         if (isLogin) {
           navigate("/welcome");
-          authCtx.currentUser=data.email;
+          if(isLogin){
+            fetcMessageshandler();
+
+          }
         }
         authCtx.login(data.idToken)
-        console.log(authCtx)
+        authCtx.setPrf(data.email)
+        
       })
       .catch((err) => {
         alert(err.message);
       });
-      const userEmailz=enteredEmail.split(/[@.]/).join("");
-      console.log(userEmailz)
+      // const userEmailz=enteredEmail.split(/[@.]/).join("");
+      
       const fetcMessageshandler=async()=>{
-            const response= await fetch(`https://try2-7cacf-default-rtdb.asia-southeast1.firebasedatabase.app/${userEmailz}.json`)
+            const response= await fetch(`https://emailclient-16191-default-rtdb.firebaseio.com/${userEmailz}.json`)
             const data= await response.json();
             console.log(data)
             for(const key in data){
-              messageCtx.loadedMessages.push({
+            //   messageCtx.loadedMessages.push({
+            //     id:key,
+            //     rb:data[key].from,
+            //     sub:data[key].userSub,
+            //     text:data[key].usertext
+            //   })
+            dispatch(addMessage({
                 id:key,
-                rb:data[key].sender,
+                rb:data[key].from,
                 sub:data[key].userSub,
-                text:data[key].usertext
-              })
+                text:data[key].usertext,
+                read:data[key].read
+            }))
               
              }
-             console.log(messageCtx)
+             console.log('slice',messSlice)
 
           }
+          
          
 
-          fetcMessageshandler();
 
   };
  
 //   
  
   return (
-    <Container className="d-block justify-content-center mt-5 w-25 ">
-      <Form onSubmit={authFormHandler} className="border rounded p-5 mt-3 ">
+  
+    <Container  className="d-block justify-content-center  mt-5" >
+      <Form onSubmit={authFormHandler} className="border border-secondary rounded   p-5 mt-3 ">
         <h2 className="text-center pb-3">{isLogin ? "Login" : "SignUp"}</h2>
 
         <Form.Group className="mb-3" controlId="formBasicEmail">
@@ -138,6 +155,7 @@ const Auth = () => {
         )}
       </Form>
     </Container>
+    
   );
 };
 

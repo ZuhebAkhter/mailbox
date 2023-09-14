@@ -5,6 +5,9 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-image: url('https://as2.ftcdn.net/v2/jpg/01/83/34/37/1000_F_183343747_7Rfc2EwYBPJchAJ0SVLuDvHAwZPA9sp6.jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
 }
 
 code {
